@@ -1,1 +1,0 @@
-Microsoft Word does not treat sentences differently by default , but the grammar checking can be set to prefer a specific number of spaces between sentences .

@@ -1,1 +1,0 @@
-Points , NRR = Net run rate .

@@ -46,6 +46,8 @@ from vectorstore import VectorStore, VectorStoreConfig
 from memory import MemoryConfig, MemoryModule
 from agents import RagAgent, AgentConfig, LLMConfig, LLMGenerator
 from download_wikitext_eval import download_wikitext_eval
+import json
+import logging
 
 
 from metrics import (
@@ -414,6 +416,26 @@ def main():
     export_throughput_csv(metrics, "throughput.csv")
     # If you want an image saved instead of on-screen:
     plot_throughput_matplotlib(metrics, "throughput.png")
+
+    
+    # ⬇️ NEW: LLM generation token stats
+    llm_stats = agent.llm.get_generation_stats()
+
+    logger.info(
+        "LLM generation stats: total_tokens=%d, total_time=%.3fs, "
+        "num_generations=%d, avg_gen_time=%.4fs, tokens_per_second=%.2f",
+        llm_stats["total_generated_tokens"],
+        llm_stats["total_generation_time_s"],
+        llm_stats["num_generations"],
+        (llm_stats["avg_latency_per_generation_s"] or 0.0),
+        (llm_stats["tokens_per_second"] or 0.0),
+    )
+
+    # Also dump to a JSON file for paper/post-processing
+    with open("llm_generation_stats.json", "w", encoding="utf-8") as f:
+        json.dump(llm_stats, f, indent=2)
+    logger.info("LLM generation stats written to llm_generation_stats.json")
+
 
 
 

@@ -27,6 +27,9 @@ Latency metrics:
       wraps the entire context-building step:
         embed_query + vectorstore.search + memory.load_context
 
+  - llm.generate
+      wraps the model.generate() call inside LLMGenerator.
+
 All lower-level latencies from embedder, vectorstore, and memory
 are recorded in their respective modules.
 """
@@ -34,6 +37,7 @@ are recorded in their respective modules.
 from __future__ import annotations
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -73,6 +77,10 @@ class LLMGenerator:
       - use `truncation=True` when max_length is set for inputs,
       - pass only `max_new_tokens` (not `max_length`) to `generate()`
         to avoid HF warnings.
+
+    In addition, it:
+      - wraps generation with a `llm.generate` latency metric
+      - tracks total generated tokens and generation time for throughput stats.
     """
 
     def __init__(self, config: LLMConfig) -> None:
@@ -95,10 +103,16 @@ class LLMGenerator:
         self.model.to(self.device)
         self.model.eval()
 
+        # Aggregated generation stats
+        self.total_generated_tokens: int = 0
+        self.total_generation_time_s: float = 0.0
+        self.num_generations: int = 0
+
     def generate(
         self,
         prompt: str,
         extra_context: Optional[str] = None,
+        **_: Any,
     ) -> str:
         """
         Generate an answer given a prompt and optional context string.
@@ -115,6 +129,9 @@ class LLMGenerator:
           - max_new_tokens = self.config.max_new_tokens
           - do_sample = self.config.do_sample
           - temperature, top_p as configured
+
+        Extra keyword arguments (**_) are accepted and ignored to remain
+        compatible with different agent call signatures.
         """
         if extra_context:
             full_prompt = f"{prompt}\n\n{extra_context}"
@@ -133,19 +150,28 @@ class LLMGenerator:
         do_sample = self.config.do_sample and self.config.temperature is not None
 
         # 3) Generate WITHOUT max_length (only max_new_tokens)
+        start = time.perf_counter()
         with torch.no_grad():
-            outputs = self.model.generate(
-                **inputs,
-                max_new_tokens=self.config.max_new_tokens,
-                do_sample=do_sample,
-                temperature=self.config.temperature if do_sample else 1.0,
-                top_p=self.config.top_p,
-                pad_token_id=self.tokenizer.pad_token_id,
-            )
+            with record_latency("llm.generate", store_samples=True):
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=self.config.max_new_tokens,
+                    do_sample=do_sample,
+                    temperature=self.config.temperature if do_sample else 1.0,
+                    top_p=self.config.top_p,
+                    pad_token_id=self.tokenizer.pad_token_id,
+                )
+        elapsed = time.perf_counter() - start
 
-        # 4) Decode only the continuation (optional but cleaner)
+        # 4) Token accounting: input vs total → generated
         generated_ids = outputs[0]
         input_len = inputs["input_ids"].shape[1]
+        total_len = generated_ids.shape[0]
+        num_generated = max(total_len - input_len, 0)
+
+        self.total_generated_tokens += num_generated
+        self.total_generation_time_s += elapsed
+        self.num_generations += 1
 
         # Option A: decode only the newly generated tokens
         continuation = self.tokenizer.decode(
@@ -153,6 +179,39 @@ class LLMGenerator:
             skip_special_tokens=True,
         )
         return continuation.strip()
+
+    def get_generation_stats(self) -> Dict[str, Any]:
+        """
+        Return aggregate stats about LLM generation:
+          - total_generated_tokens
+          - total_generation_time_s
+          - num_generations
+          - avg_latency_per_generation_s
+          - tokens_per_second
+        """
+        if self.num_generations == 0 or self.total_generation_time_s <= 0:
+            return {
+                "total_generated_tokens": 0,
+                "total_generation_time_s": 0.0,
+                "num_generations": 0,
+                "avg_latency_per_generation_s": None,
+                "tokens_per_second": None,
+            }
+
+        avg_gen_time = self.total_generation_time_s / self.num_generations
+        tokens_per_second = (
+            self.total_generated_tokens / self.total_generation_time_s
+            if self.total_generation_time_s > 0
+            else None
+        )
+
+        return {
+            "total_generated_tokens": self.total_generated_tokens,
+            "total_generation_time_s": self.total_generation_time_s,
+            "num_generations": self.num_generations,
+            "avg_latency_per_generation_s": avg_gen_time,
+            "tokens_per_second": tokens_per_second,
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -336,7 +395,6 @@ class RagAgent:
           - retrieved context
           - user query
         """
-        # Basic prompt structure: you can customize freely
         prompt = (
             f"{self.config.system_prompt}\n\n"
             f"=== Retrieved Context ===\n"
@@ -423,7 +481,7 @@ class RagAgent:
         Strategy:
           - Always add (role="user", content=query) and
             (role="assistant", content=answer) to STM.
-          - Optionally promote a key sentence from the answer to LTM.
+          - Promote the full answer as one LTM candidate.
           - Episodic updates can be performed periodically (e.g., every N turns)
             by providing an episodic embedding and summary.
         """
@@ -439,17 +497,13 @@ class RagAgent:
             role="user",
             content=query,
             query_embedding=q_emb,
-            # no LTM candidate here; just STM
         )
 
-        # 3) Extract a simple LTM candidate from the answer.
-        #    For now, we treat the full answer as 1 LTM candidate.
+        # 3) Treat the full answer as 1 LTM candidate for now
         ltm_candidate_text = answer
         ltm_candidate_emb = self.embedder.embed_query(ltm_candidate_text)
 
-        # 4) Optionally: EM updates could be based on a coarser summary.
-        #    For now, we omit EM here; you can add episodic updates by
-        #    computing an `em_candidate_embedding` and `em_summary`.
+        # 4) Store assistant answer in STM + optionally LTM
         self.memory.store_interaction(
             role="assistant",
             content=answer,

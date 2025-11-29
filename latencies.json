@@ -1,0 +1,128 @@
+{
+  "preprocess.load": {
+    "count": 14,
+    "total_sec": 0.0008025909774005413,
+    "avg_ms": 0.05732792695718152,
+    "min_ms": 0.0511673279106617,
+    "max_ms": 0.08142413571476936
+  },
+  "preprocess.clean": {
+    "count": 14,
+    "total_sec": 0.00027196528390049934,
+    "avg_ms": 0.019426091707178524,
+    "min_ms": 0.00189291313290596,
+    "max_ms": 0.05073565989732742
+  },
+  "preprocess.chunk": {
+    "count": 14,
+    "total_sec": 1.6800127923488617e-05,
+    "avg_ms": 0.001200009137392044,
+    "min_ms": 0.0006407499313354492,
+    "max_ms": 0.0028656795620918274
+  },
+  "preprocess.chunk_per_chunk": {
+    "count": 15,
+    "total_sec": 9.88692045211792e-06,
+    "avg_ms": 0.0006591280301411947,
+    "min_ms": 0.0004600733518600464,
+    "max_ms": 0.0013927929103374481
+  },
+  "preprocessing_documents": {
+    "count": 14,
+    "total_sec": 0.000392913818359375,
+    "avg_ms": 0.028065272739955356,
+    "min_ms": 0.008487142622470856,
+    "max_ms": 0.06171688437461853
+  },
+  "preprocessing_total_run": {
+    "count": 1,
+    "total_sec": 0.0018391720950603485,
+    "avg_ms": 1.8391720950603485,
+    "min_ms": 1.8391720950603485,
+    "max_ms": 1.8391720950603485
+  },
+  "embedding.tokenize": {
+    "count": 29,
+    "total_sec": 0.02307791030034423,
+    "avg_ms": 0.7957900103566976,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding.forward": {
+    "count": 29,
+    "total_sec": 1.3586369790136814,
+    "avg_ms": 46.84955100047177,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding_corpus": {
+    "count": 1,
+    "total_sec": 0.6396773541346192,
+    "avg_ms": 639.6773541346192,
+    "min_ms": 639.6773541346192,
+    "max_ms": 639.6773541346192
+  },
+  "context_store_vectorstore": {
+    "count": 1,
+    "total_sec": 8.112285286188126e-05,
+    "avg_ms": 0.08112285286188126,
+    "min_ms": 0.08112285286188126,
+    "max_ms": 0.08112285286188126
+  },
+  "embedding_query": {
+    "count": 28,
+    "total_sec": 0.7493637441657484,
+    "avg_ms": 26.76299086306244,
+    "min_ms": 8.026986382901669,
+    "max_ms": 50.543383695185184
+  },
+  "context_load_vectorstore": {
+    "count": 14,
+    "total_sec": 0.0011608479544520378,
+    "avg_ms": 0.08291771103228841,
+    "min_ms": 0.04763016477227211,
+    "max_ms": 0.11348538100719452
+  },
+  "context_load_memory.stm": {
+    "count": 14,
+    "total_sec": 8.525187149643898e-05,
+    "avg_ms": 0.006089419392602784,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.ltm": {
+    "count": 14,
+    "total_sec": 0.0011890106834471226,
+    "avg_ms": 0.08492933453193732,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.em": {
+    "count": 14,
+    "total_sec": 1.2124888598918915e-05,
+    "avg_ms": 0.0008660634713513511,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory": {
+    "count": 14,
+    "total_sec": 0.0014459872618317604,
+    "avg_ms": 0.10328480441655431,
+    "min_ms": 0.020348001271486282,
+    "max_ms": 0.148761086165905
+  },
+  "context_build_total": {
+    "count": 14,
+    "total_sec": 0.3292798143811524,
+    "avg_ms": 23.519986741510884,
+    "min_ms": 8.43507843092084,
+    "max_ms": 50.88882800191641
+  },
+  "context_store_memory": {
+    "count": 28,
+    "total_sec": 0.0017335666343569756,
+    "avg_ms": 0.061913094084177694,
+    "min_ms": 0.006041955202817917,
+    "max_ms": 0.19106222316622734
+  }
+}

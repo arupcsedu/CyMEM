@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """
 download_hf_dataset.py
+Author: Arup Sarker
+Email: djy8hg@virginia.edu, arupcsedu@gmail.com
+Date: 01/10/2025
 
 Utility script to download a text dataset from Hugging Face and export it as
 a folder of .txt files suitable for RAG preprocessing.

@@ -29,6 +29,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Tuple
+from utils import get_hpc_shard
 
 try:
     import pandas as pd  # optional, used only for CSV/TSV
@@ -206,6 +207,69 @@ def load_raw_documents(
     text_key: str = "text",
     table_text_column: str = "text",
     file_glob: str = "*",
+    rank: int = 0,
+    world_size: int = 1,
+) -> List[Tuple[str, Dict[str, str]]]:
+    """
+    Load raw documents from a directory or single file.
+
+    If world_size > 1, shard the file list across ranks using
+    a simple modulo scheme: file_idx % world_size == rank.
+     - `preprocess.load`: 1 sample per file (not per document pair).
+    """
+    path = Path(input_path)
+    pairs: List[Tuple[str, Dict[str, str]]] = []
+
+    if not path.exists():
+        raise FileNotFoundError(f"Input path does not exist: {path}")
+
+    if path.is_dir():
+        all_files = sorted(path.glob(file_glob))
+    else:
+        all_files = [path]
+
+    # Shard files across ranks
+    files = [
+        f for i, f in enumerate(all_files)
+        if i % max(world_size, 1) == rank and not f.is_dir()
+    ]
+
+    logger.info(
+        "Rank %d/%d loading %d of %d files from %s",
+        rank, world_size, len(files), len(all_files), input_path,
+    )
+
+    for f in files:
+        # Time each file load separately:
+        with record_latency("preprocess.load", store_samples=True):
+            suffix = f.suffix.lower()
+            if suffix in {".txt", ".md", ".log"}:
+                text = _read_text_file(f)
+                if text:
+                    pairs.append((text, {"source_file": str(f)}))
+
+            elif suffix in {".json", ".jsonl"}:
+                pairs.extend(_read_json_file(f, text_key=text_key))
+
+            elif suffix in {".csv", ".tsv"}:
+                pairs.extend(_read_table_file(f, text_column=table_text_column))
+
+            else:
+                text = _read_text_file(f)
+                if text:
+                    pairs.append((text, {"source_file": str(f)}))
+
+    logger.info(
+        "Rank %d/%d loaded %d raw document(s) from %s",
+        rank, world_size, len(pairs), input_path,
+    )
+    return pairs
+'''
+def load_raw_documents(
+    input_path: str | Path,
+    text_key: str = "text",
+    table_text_column: str = "text",
+    file_glob: str = "*",
 ) -> List[Tuple[str, Dict[str, str]]]:
     """
     Load raw documents from a directory or single file.
@@ -259,7 +323,7 @@ def load_raw_documents(
 
     logger.info("Loaded %d raw document(s) from %s", len(pairs), input_path)
     return pairs
-
+'''
 
 # ---------------------------------------------------------------------------
 # High-level preprocessing entry point

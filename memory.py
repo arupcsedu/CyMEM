@@ -1,5 +1,9 @@
 """
 memory.py
+Author: Arup Sarker
+Email: djy8hg@virginia.edu, arupcsedu@gmail.com
+Date: 21/10/2025
+
 
 Hierarchical memory module for Agentic RAG in Deep RC RAG.
 

@@ -1,5 +1,8 @@
 """
 embedder.py
+Author: Arup Sarker
+Email: djy8hg@virginia.edu, arupcsedu@gmail.com
+Date: 18/10/2025
 
 Embedding utilities for Deep RC RAG.
 

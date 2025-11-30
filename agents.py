@@ -1,5 +1,10 @@
 """
 agents.py
+'''
+Author: Arup Sarker
+Email: djy8hg@virginia.edu, arupcsedu@gmail.com
+Date: 22/10/2025
+'''
 
 Agent orchestration for Deep RC RAG.
 

@@ -48,6 +48,7 @@ from agents import RagAgent, AgentConfig, LLMConfig, LLMGenerator
 from download_wikitext_eval import download_wikitext_eval
 import json
 import logging
+from utils import get_hpc_shard
 
 
 from metrics import (
@@ -367,7 +368,7 @@ def load_local_eval_dataset(eval_dir):
 
     return queries
 
-
+'''
 def run_eval_from_local_files(agent, eval_dir, max_samples):
     queries = load_local_eval_dataset(eval_dir)
     queries = queries[:max_samples]
@@ -380,8 +381,144 @@ def run_eval_from_local_files(agent, eval_dir, max_samples):
 
         answer, debug = agent.generate_answer(query)
         print("[Answer]:\n", answer)
+'''
+
+import glob
+import json
+import os
+from typing import Any, Dict, List, Optional, Tuple
+
+from utils import get_hpc_shard
+from agents import RagAgent
+import logging
+
+logger = logging.getLogger(__name__)
 
 
+def _load_eval_queries_from_file(path: str) -> List[Dict[str, Any]]:
+    """
+    Load queries from a single eval file.
+
+    Supported formats:
+      - .txt / .md / .log:
+          entire file content becomes one query: {"id": path, "query": text}
+      - .json / .jsonl:
+          * dict with "query" or "text" field
+          * list of dicts with "query" or "text" field
+    """
+    queries: List[Dict[str, Any]] = []
+    suffix = os.path.splitext(path)[1].lower()
+
+    # Plain text → one query per file
+    if suffix in {".txt", ".md", ".log"}:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                text = f.read().strip()
+            if text:
+                queries.append({"id": path, "query": text})
+        except Exception as exc:
+            logger.error("Failed to read text file %s: %s", path, exc)
+
+    # JSON / JSONL
+    elif suffix in {".json", ".jsonl"}:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                raw = f.read()
+
+            # Try JSONL
+            if suffix == ".jsonl" or "\n" in raw:
+                lines = [ln.strip() for ln in raw.splitlines() if ln.strip()]
+                is_jsonl = all(ln.startswith("{") and ln.endswith("}") for ln in lines)
+            else:
+                is_jsonl = False
+
+            if is_jsonl:
+                for i, ln in enumerate(lines):
+                    try:
+                        rec = json.loads(ln)
+                    except json.JSONDecodeError:
+                        continue
+                    q = rec.get("query") or rec.get("text")
+                    if q:
+                        queries.append({"id": f"{path}#line{i}", "query": str(q)})
+            else:
+                obj = json.loads(raw)
+                if isinstance(obj, dict):
+                    q = obj.get("query") or obj.get("text")
+                    if q:
+                        queries.append({"id": path, "query": str(q)})
+                elif isinstance(obj, list):
+                    for i, rec in enumerate(obj):
+                        if not isinstance(rec, dict):
+                            continue
+                        q = rec.get("query") or rec.get("text")
+                        if q:
+                            queries.append({"id": f"{path}#idx{i}", "query": str(q)})
+        except Exception as exc:
+            logger.error("Failed to read JSON from %s: %s", path, exc)
+
+    else:
+        # Unknown extension → ignore
+        logger.debug("Skipping unsupported eval file type: %s", path)
+
+    return queries
+
+
+def run_eval_from_local_files(
+    agent: RagAgent,
+    eval_dir: str,
+    max_samples: Optional[int] = None,
+) -> None:
+    """
+    Rank-aware eval loop that reads queries from ALL local files in eval_dir.
+
+    Supported:
+      - *.txt / *.md / *.log     -> 1 query per file
+      - *.json / *.jsonl         -> dict or list with 'query' or 'text' key
+
+    Each rank (from get_hpc_shard) evaluates a disjoint subset of queries.
+    """
+    rank, world_size = get_hpc_shard()
+
+    pattern = os.path.join(eval_dir, "*")
+    paths = sorted(glob.glob(pattern))
+
+    all_queries: List[Dict[str, Any]] = []
+    for p in paths:
+        file_queries = _load_eval_queries_from_file(p)
+        all_queries.extend(file_queries)
+
+    if not all_queries:
+        logger.warning("No eval queries found under %s", eval_dir)
+        return
+
+    if max_samples is not None:
+        all_queries = all_queries[:max_samples]
+
+    # Shard queries across ranks
+    local_queries = [
+        (i, q) for i, q in enumerate(all_queries)
+        if i % max(world_size, 1) == rank
+    ]
+
+    logger.info(
+        "Rank %d/%d evaluating %d of %d queries from %s",
+        rank, world_size, len(local_queries), len(all_queries), eval_dir,
+    )
+
+    # Simple stdout print; you can also log to file if you want
+    for idx, rec in local_queries:
+        qid = rec.get("id", f"q{idx}")
+        query = rec["query"]
+
+        answer, debug = agent.generate_answer(query)
+
+        print("=" * 80)
+        print(f"[Rank {rank}] Query #{idx} (id={qid}):")
+        print(query[:500])
+        print("\n[Answer]:")
+        print(answer.strip())
+        print("=" * 80)
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -416,6 +553,12 @@ def main():
     export_throughput_csv(metrics, "throughput.csv")
     # If you want an image saved instead of on-screen:
     plot_throughput_matplotlib(metrics, "throughput.png")
+
+
+    # Sanity check: force one LLM call so we know stats work
+    #test_query = "RADICAL-Pilot provides pilot-job abstraction and deterministic scheduling for HPC workflows."
+    #answer, debug = agent.generate_answer(test_query)
+    #logger.info("Test query answer (truncated): %s", answer[:200])
 
     
     # ⬇️ NEW: LLM generation token stats

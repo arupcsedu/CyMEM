@@ -16,6 +16,8 @@ Each example's `text` field from:
 
 is treated as a query to the RAG+memory agent.
 
+unset GIT_ASKPASS
+
 Requirements:
   pip install datasets transformers faiss-cpu  # (faiss optional)
   python -m main \

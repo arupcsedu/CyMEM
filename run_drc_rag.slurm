@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=drc_rag
-#SBATCH --nodes=2              # number of nodes
+#SBATCH --nodes=2             # number of nodes
 #SBATCH --ntasks-per-node=4     # 4 ranks per node → total 8
 #SBATCH -A bii_dsc_community
 ##SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00
-#SBATCH --partition=parallel     # change to your cluster's partition
-##SBATCH --gres=gpu:a100:1
+#SBATCH --partition=gpu     # change to your cluster's partition
+#SBATCH --gres=gpu:a100:1
 #SBATCH --output=drc_rag_%j.out
 #SBATCH --error=drc_rag_%j.err
 

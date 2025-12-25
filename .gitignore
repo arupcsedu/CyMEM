@@ -58,6 +58,7 @@ cover/
 *.err
 *.out
 *.pyc
+*.*.pyc
 
 
 # Django stuff:

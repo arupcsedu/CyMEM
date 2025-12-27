@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=drc_rag
-#SBATCH --nodes=2             # number of nodes
+#SBATCH --nodes=2            # number of nodes
 #SBATCH --ntasks-per-node=4     # 4 ranks per node → total 8
 #SBATCH -A bii_dsc_community
-##SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00
-#SBATCH --partition=gpu     # change to your cluster's partition
-#SBATCH --gres=gpu:a100:1
+#SBATCH --partition=parallel     # change to your cluster's partition
+##SBATCH --gres=gpu:a100:2
 #SBATCH --output=drc_rag_%j.out
 #SBATCH --error=drc_rag_%j.err
 
@@ -26,4 +26,6 @@ source activate /scratch/djy8hg/env/deep_rc_rag_env
 cd /sfs/gpfs/tardis/project/bi_dsc_community/drc_rag
 
 # Use srun to launch one Python process per task
-python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
+#python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
+srun --ntasks=$SLURM_NTASKS python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
+

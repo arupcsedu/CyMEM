@@ -5,34 +5,57 @@ Email: djy8hg@virginia.edu, arupcsedu@gmail.com
 Date: 22/11/2025
 """
 
-
+# utils.py
 import os
 from typing import Tuple
 
 
+def _get_int_env(*names: str, default: int) -> int:
+    for n in names:
+        v = os.environ.get(n)
+        if v is None:
+            continue
+        try:
+            return int(v)
+        except Exception:
+            continue
+    return default
+
+
 def get_hpc_shard() -> Tuple[int, int]:
     """
-    Determine (rank, world_size) from SLURM or generic distributed env vars.
-
-    Fallback to (0, 1) for single-process runs.
+    Return (rank, world_size) robustly across:
+      - Slurm (SLURM_PROCID / SLURM_NTASKS / SLURM_STEP_NUM_TASKS)
+      - PMI (PMI_RANK / PMI_SIZE, PMIX_RANK / PMIX_SIZE)
+      - OpenMPI (OMPI_COMM_WORLD_RANK / OMPI_COMM_WORLD_SIZE)
+      - Generic env (RANK / WORLD_SIZE)
     """
-    # SLURM
-    rank = os.environ.get("SLURM_PROCID")
-    world_size = os.environ.get("SLURM_NTASKS")
+    rank = _get_int_env(
+        "SLURM_PROCID",
+        "PMI_RANK",
+        "PMIX_RANK",
+        "OMPI_COMM_WORLD_RANK",
+        "RANK",
+        default=0,
+    )
 
-    # Generic (e.g., torch.distributed or other launchers)
-    if rank is None:
-        rank = os.environ.get("RANK", "0")
-    if world_size is None:
-        world_size = os.environ.get("WORLD_SIZE", "1")
+    world_size = _get_int_env(
+        "SLURM_STEP_NUM_TASKS",   # often more reliable inside srun step
+        "SLURM_NTASKS",
+        "PMI_SIZE",
+        "PMIX_SIZE",
+        "OMPI_COMM_WORLD_SIZE",
+        "WORLD_SIZE",
+        default=1,
+    )
 
-    try:
-        r = int(rank)
-    except Exception:
-        r = 0
-    try:
-        ws = int(world_size)
-    except Exception:
-        ws = 1
+    # Safety
+    if world_size <= 0:
+        world_size = 1
+    if rank < 0:
+        rank = 0
+    if rank >= world_size:
+        # still run, but avoid crashing sharding
+        rank = rank % world_size
 
-    return r, ws
+    return rank, world_size

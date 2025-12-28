@@ -1,0 +1,135 @@
+{
+  "embedding.tokenize": {
+    "count": 6,
+    "total_sec": 0.0047859614714980125,
+    "avg_ms": 0.7976602452496687,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding.forward": {
+    "count": 6,
+    "total_sec": 0.3871079199016094,
+    "avg_ms": 64.51798665026824,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding_query": {
+    "count": 5,
+    "total_sec": 0.272974269464612,
+    "avg_ms": 54.5948538929224,
+    "min_ms": 9.312043897807598,
+    "max_ms": 125.39126724004745
+  },
+  "preprocess.load": {
+    "count": 2,
+    "total_sec": 0.00032342225313186646,
+    "avg_ms": 0.16171112656593323,
+    "min_ms": 0.13329461216926575,
+    "max_ms": 0.1901276409626007
+  },
+  "preprocess.clean": {
+    "count": 2,
+    "total_sec": 5.040224641561508e-05,
+    "avg_ms": 0.02520112320780754,
+    "min_ms": 0.005720183253288269,
+    "max_ms": 0.04468206316232681
+  },
+  "preprocess.chunk": {
+    "count": 2,
+    "total_sec": 3.7299469113349915e-06,
+    "avg_ms": 0.0018649734556674957,
+    "min_ms": 0.0012200325727462769,
+    "max_ms": 0.0025099143385887146
+  },
+  "preprocess.chunk_per_chunk": {
+    "count": 2,
+    "total_sec": 3.230758011341095e-06,
+    "avg_ms": 0.0016153790056705475,
+    "min_ms": 0.001000240445137024,
+    "max_ms": 0.002230517566204071
+  },
+  "preprocessing_documents": {
+    "count": 2,
+    "total_sec": 7.67931342124939e-05,
+    "avg_ms": 0.03839656710624695,
+    "min_ms": 0.02374127507209778,
+    "max_ms": 0.05305185914039612
+  },
+  "preprocessing_total_run": {
+    "count": 1,
+    "total_sec": 0.01393153052777052,
+    "avg_ms": 13.93153052777052,
+    "min_ms": 13.93153052777052,
+    "max_ms": 13.93153052777052
+  },
+  "embedding_corpus": {
+    "count": 1,
+    "total_sec": 0.12051994167268276,
+    "avg_ms": 120.51994167268276,
+    "min_ms": 120.51994167268276,
+    "max_ms": 120.51994167268276
+  },
+  "context_store_vectorstore": {
+    "count": 1,
+    "total_sec": 2.0100735127925873e-05,
+    "avg_ms": 0.020100735127925873,
+    "min_ms": 0.020100735127925873,
+    "max_ms": 0.020100735127925873
+  },
+  "context_load_vectorstore": {
+    "count": 2,
+    "total_sec": 0.0002467986196279526,
+    "avg_ms": 0.12339930981397629,
+    "min_ms": 0.08991267532110214,
+    "max_ms": 0.15688594430685043
+  },
+  "context_load_memory.stm": {
+    "count": 2,
+    "total_sec": 7.850117981433868e-06,
+    "avg_ms": 0.003925058990716934,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.ltm": {
+    "count": 2,
+    "total_sec": 6.290152668952942e-06,
+    "avg_ms": 0.003145076334476471,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.em": {
+    "count": 2,
+    "total_sec": 4.0298327803611755e-06,
+    "avg_ms": 0.0020149163901805878,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory": {
+    "count": 2,
+    "total_sec": 3.923103213310242e-05,
+    "avg_ms": 0.01961551606655121,
+    "min_ms": 0.013920478522777557,
+    "max_ms": 0.02531055361032486
+  },
+  "context_build_total": {
+    "count": 2,
+    "total_sec": 0.0691214045509696,
+    "avg_ms": 34.5607022754848,
+    "min_ms": 9.644138626754284,
+    "max_ms": 59.47726592421532
+  },
+  "llm.generate": {
+    "count": 2,
+    "total_sec": 13.513174842111766,
+    "avg_ms": 6756.587421055883,
+    "min_ms": 6391.152661293745,
+    "max_ms": 7122.022180818021
+  },
+  "context_store_memory": {
+    "count": 4,
+    "total_sec": 0.0002370290458202362,
+    "avg_ms": 0.05925726145505905,
+    "min_ms": 0.011840835213661194,
+    "max_ms": 0.11335406452417374
+  }
+}

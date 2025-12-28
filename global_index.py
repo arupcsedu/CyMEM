@@ -178,13 +178,14 @@ def build_or_load_global_vectorstore(
     # Rank 0 builds FULL index
     if rank == 0:
         logger.info("Rank 0 building GLOBAL vectorstore from %s", input_path)
+        os.environ["SLURM_PROCID"] = "0"
+        os.environ["SLURM_NTASKS"] = "1"
 
         chunks, metadatas = preprocess_documents(
             input_path=input_path,
             max_chars=max_chars,
             overlap_chars=overlap_chars,
-            file_glob=file_glob,
-            shard=False,  # << IMPORTANT
+            file_glob=file_glob
         )
 
         embeddings = embedder.embed_corpus(chunks)

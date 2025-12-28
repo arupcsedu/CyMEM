@@ -1,7 +1,10 @@
 """
 vectorstore.py
+Author: Arup Sarker
+Email: djy8hg@virginia.edu, arupcsedu@gmail.com
+Date: 22/11/2025
+Descriptions: Vector store abstraction for Deep RC RAG.
 
-Vector store abstraction for Deep RC RAG.
 
 This module provides a simple interface around FAISS (if available) or a
 NumPy-based fallback for similarity search. It stores dense embeddings for

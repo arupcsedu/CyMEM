@@ -24,8 +24,18 @@ module load miniforge/24.3.0-py3.11
 source activate /scratch/djy8hg/env/deep_rc_rag_env
 
 cd /sfs/gpfs/tardis/project/bi_dsc_community/drc_rag
+export IDX=/sfs/gpfs/tardis/project/bi_dsc_community/drc_rag/shared_index_wikitext
 
 # Use srun to launch one Python process per task
 #python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
-srun --ntasks=$SLURM_NTASKS python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
+#srun --ntasks=$SLURM_NTASKS python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
+
+srun --ntasks=$SLURM_NTASKS python -m main_global \
+  --data_dir data/wikitext_eval \
+  --global_index_dir $IDX \
+  --use_faiss \
+  --llm gpt2 \
+  --eval_dir data/wikitext_eval
+
+
 

@@ -1,0 +1,7 @@
+{
+  "dim": 384,
+  "num_docs": 15,
+  "world_size_at_build": 8,
+  "faiss_index_type": "IndexFlatL2",
+  "normalize_embeddings": true
+}

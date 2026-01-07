@@ -26,23 +26,27 @@ source activate /scratch/djy8hg/env/deep_rc_rag_env
 cd /sfs/gpfs/tardis/project/bi_dsc_community/drc_rag
 export IDX=/sfs/gpfs/tardis/project/bi_dsc_community/drc_rag/shared_index_wikitext
 export RUNS=/sfs/gpfs/tardis/project/bi_dsc_community/drc_rag/runs/global_ranks_$SLURM_NTASKS
-mkdir -p $RUNS
+#mkdir -p $RUNS
 
 
 # Use srun to launch one Python process per task
 #python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
 #srun --ntasks=$SLURM_NTASKS python -m main  --data_dir data/wikitext_eval   --use_faiss   --llm gpt2
 
+#For running baseline parallelism
+#srun --ntasks=$SLURM_NTASKS python -m main_baseline --data_dir data/wikitext_eval --eval_dir data/eval_queries --use_faiss --llm gpt2 --out_dir runs --tag baseline_8ranks
+srun --ntasks=$SLURM_NTASKS python -m main_baseline_v2 --data_dir data/wikitext_eval --eval_dir data/eval_queries --use_faiss --llm gpt2 --out_dir runs --tag baseline_8ranks
+
+
 #For running global master(rank 0) and slaves(1-n) parallelism
-srun --ntasks=$SLURM_NTASKS python -m main_global \
-  --data_dir data/wikitext_eval \
-  --global_index_dir $IDX \
-  --use_faiss \
-  --llm gpt2 \
-  --eval_dir data/wikitext_eval \
-  --lat_csv $RUNS/latencies.global.csv \
-  --lat_json $RUNS/latencies.global.json \
-  --llm_stats_json $RUNS/llm_generation_stats.global.json
+
+#srun --ntasks=$SLURM_NTASKS python -m main_global --data_dir data/wikitext_eval --global_index_dir $IDX --use_faiss  --llm gpt2 --eval_dir data/wikitext_eval --lat_csv $RUNS/latencies.global.csv --lat_json $RUNS/latencies.global.json --llm_stats_json $RUNS/llm_generation_stats.global.json
+  
+#srun --ntasks=$SLURM_NTASKS python -m main_global --data_dir data/wikitext_eval --eval_dir data/eval_queries --use_faiss --llm gpt2 --out_dir runs --tag global_8ranks
+
+
+#For running benchmarking between baseline and global parallelism
+#python benchmark_compare.py --baseline_dir runs/baseline_8ranks --global_dir runs/global_ranks_8 --out_dir runs/compare_out
 
 
  

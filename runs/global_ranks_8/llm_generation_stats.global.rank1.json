@@ -1,7 +1,7 @@
 {
   "total_generated_tokens": 256,
-  "total_generation_time_s": 13.490629322826862,
+  "total_generation_time_s": 13.491250976920128,
   "num_generations": 2,
-  "avg_latency_per_generation_s": 6.745314661413431,
-  "tokens_per_second": 18.976134757986003
+  "avg_latency_per_generation_s": 6.745625488460064,
+  "tokens_per_second": 18.975260369697857
 }

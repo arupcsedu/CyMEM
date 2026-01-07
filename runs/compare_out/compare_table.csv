@@ -1,0 +1,4 @@
+run,run_dir,metrics_files_used,docs,chunks,runtime_s,docs_per_sec,chunks_per_sec
+baseline,runs/baseline_8ranks,8,14,15,0.000000,0.000000,0.000000
+global,runs/global_ranks_8,8,2,2,0.000000,0.000000,0.000000
+

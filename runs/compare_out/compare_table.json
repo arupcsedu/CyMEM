@@ -1,0 +1,22 @@
+[
+  {
+    "name": "baseline",
+    "run_dir": "runs/baseline_8ranks",
+    "metrics_files_used": 8,
+    "docs": 14,
+    "chunks": 15,
+    "runtime_s": 0.0,
+    "docs_per_sec": 0.0,
+    "chunks_per_sec": 0.0
+  },
+  {
+    "name": "global",
+    "run_dir": "runs/global_ranks_8",
+    "metrics_files_used": 8,
+    "docs": 2,
+    "chunks": 2,
+    "runtime_s": 0.0,
+    "docs_per_sec": 0.0,
+    "chunks_per_sec": 0.0
+  }
+]

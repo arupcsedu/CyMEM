@@ -1,0 +1,4 @@
+metric,baseline,global,speedup_x
+runtime_s,0.000000,0.000000,0.000000
+docs_per_sec,0.000000,0.000000,0.000000
+chunks_per_sec,0.000000,0.000000,0.000000

@@ -24,6 +24,12 @@ Usage examples:
       --text_column text \
       --max_samples 10000 \
       --output_dir data/ag_news_train
+      
+  python download_hf_dataset.py \
+  --dataset_name wikitext \
+  --subset_name wikitext-103-raw-v1 \
+  --split train \
+  --output_dir data/wikitext103_train
 
 Requirements:
   pip install datasets

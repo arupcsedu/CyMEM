@@ -5,6 +5,7 @@ Email: djy8hg@virginia.edu, arupcsedu@gmail.com
 Date: 13/12/2025
 Descriptions: Parallelism-2, Rank 0 is responsible tokenizing and saving to vector store; other rank is responsible to load and use it! 
 '''
+
 from __future__ import annotations
 
 import json

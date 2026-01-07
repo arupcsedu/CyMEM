@@ -1,0 +1,12 @@
+{
+  "docs": {
+    "count": 1,
+    "avg_latency_s": 7.473304867744446e-05,
+    "throughput_per_s": 13380.960869348488
+  },
+  "chunks": {
+    "count": 1,
+    "avg_latency_s": 1.8207356333732605e-06,
+    "throughput_per_s": 549228.5544757033
+  }
+}

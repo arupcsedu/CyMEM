@@ -1,0 +1,79 @@
+{
+  "embedding.tokenize": {
+    "count": 5,
+    "total_sec": 0.004028111696243286,
+    "avg_ms": 0.8056223392486572,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding.forward": {
+    "count": 5,
+    "total_sec": 0.33946748450398445,
+    "avg_ms": 67.89349690079689,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "embedding_query": {
+    "count": 5,
+    "total_sec": 0.34476771112531424,
+    "avg_ms": 68.95354222506285,
+    "min_ms": 9.333210065960884,
+    "max_ms": 145.88506147265434
+  },
+  "context_load_vectorstore": {
+    "count": 2,
+    "total_sec": 5.489028990268707e-05,
+    "avg_ms": 0.027445144951343536,
+    "min_ms": 0.025109387934207916,
+    "max_ms": 0.029780901968479156
+  },
+  "context_load_memory.stm": {
+    "count": 2,
+    "total_sec": 7.400289177894592e-06,
+    "avg_ms": 0.003700144588947296,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.ltm": {
+    "count": 2,
+    "total_sec": 0.028030989691615105,
+    "avg_ms": 14.015494845807552,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory.em": {
+    "count": 2,
+    "total_sec": 4.400499165058136e-06,
+    "avg_ms": 0.002200249582529068,
+    "min_ms": 0.0,
+    "max_ms": 0.0
+  },
+  "context_load_memory": {
+    "count": 2,
+    "total_sec": 0.028086824342608452,
+    "avg_ms": 14.043412171304226,
+    "min_ms": 0.016001053154468536,
+    "max_ms": 28.070823289453983
+  },
+  "context_build_total": {
+    "count": 2,
+    "total_sec": 0.18365927878767252,
+    "avg_ms": 91.82963939383626,
+    "min_ms": 37.58816048502922,
+    "max_ms": 146.0711183026433
+  },
+  "llm.generate": {
+    "count": 2,
+    "total_sec": 13.842534145340323,
+    "avg_ms": 6921.267072670162,
+    "min_ms": 6761.43002230674,
+    "max_ms": 7081.104123033583
+  },
+  "context_store_memory": {
+    "count": 4,
+    "total_sec": 0.0003557847812771797,
+    "avg_ms": 0.08894619531929493,
+    "min_ms": 0.009221024811267853,
+    "max_ms": 0.1973779872059822
+  }
+}
